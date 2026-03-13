@@ -99,10 +99,7 @@ export const DishModal: React.FC<Props> = ({ item, onClose }) => {
                 }}
               >
                 <div>
-                  <h2
-                    className="heading-lg"
-                    style={{ margin: 0, fontSize: "1.2rem", letterSpacing: "0.06em" }}
-                  >
+                  <h2 className="heading-lg" style={{ margin: 0, fontSize: "1.2rem" }}>
                     {item.name}
                   </h2>
                   <p
@@ -116,7 +113,6 @@ export const DishModal: React.FC<Props> = ({ item, onClose }) => {
                   style={{
                     textAlign: "right",
                     fontFamily: "var(--font-heading)",
-                    letterSpacing: "0.12em",
                   }}
                 >
                   {item.price.toFixed(0)} SAR

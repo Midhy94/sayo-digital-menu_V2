@@ -1,18 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  DietaryTag,
-  HighlightTag,
-  getCategoryBySlug,
-  getItemsForCategory,
-  MenuItem,
-} from "../data/menuData";
-import { SearchBar } from "../components/SearchBar";
+import { HighlightTag, getCategoryBySlug, getItemsForCategory, MenuItem } from "../data/menuData";
 import { DishItem } from "../components/DishItem";
 import { DishModal } from "../components/DishModal";
 import { FilterDrawer } from "../components/FilterDrawer";
 import { Footer } from "../components/Footer";
+
+const allFilterTags: HighlightTag[] = [
+  "chefSignature",
+  "vegan",
+  "vegetarian",
+  "containsEgg",
+  "nonVegetarian",
+  "hot",
+  "extraHot",
+  "japan",
+  "china",
+  "thailand",
+  "southKorea",
+  "malaysia",
+  "indonesia",
+  "vietnam",
+  "hawaii",
+  "singapore",
+  "india",
+  "lebanon",
+];
 
 export const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -20,56 +34,43 @@ export const CategoryPage: React.FC = () => {
   const { t } = useTranslation();
 
   const [query, setQuery] = useState("");
-  const [hiddenAllergens, setHiddenAllergens] = useState<DietaryTag[]>([]);
   const [highlightFilters, setHighlightFilters] = useState<HighlightTag[]>([]);
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const items = category ? getItemsForCategory(category.id) : [];
+  const filteredItems = items;
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => {
-      if (query.trim()) {
-        const q = query.toLowerCase();
-        if (
-          !item.name.toLowerCase().includes(q) &&
-          !item.description.toLowerCase().includes(q)
-        ) {
-          return false;
-        }
-      }
-      if (hiddenAllergens.length && item.allergens?.length) {
-        if (item.allergens.some((a) => hiddenAllergens.includes(a))) {
-          return false;
-        }
-      }
-      if (highlightFilters.length) {
-        if (!item.tags?.some((t) => highlightFilters.includes(t))) {
-          return false;
-        }
-      }
-      return true;
+  const sections = useMemo(() => {
+    const bySection = new Map<string, MenuItem[]>();
+    filteredItems.forEach((item) => {
+      const key = item.section || "";
+      if (!bySection.has(key)) bySection.set(key, []);
+      bySection.get(key)!.push(item);
     });
-  }, [items, query, hiddenAllergens, highlightFilters]);
+    return Array.from(bySection.entries());
+  }, [filteredItems]);
 
   useEffect(() => {
-    const handleFocusSearch = () => {
-      if (searchInputRef.current) {
-        searchInputRef.current.focus();
-        searchInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+    // reset search & filters on mount so lists are never accidentally empty
+    setQuery("");
+    setHighlightFilters([]);
+    setFiltersOpen(false);
+
+    const handleSearchQuery = (event: Event) => {
+      const custom = event as CustomEvent<string>;
+      setQuery(custom.detail ?? "");
     };
 
     const handleOpenFilters = () => {
       setFiltersOpen(true);
     };
 
-    window.addEventListener("sayo-focus-search", handleFocusSearch);
+    window.addEventListener("sayo-search-query", handleSearchQuery as EventListener);
     window.addEventListener("sayo-open-filters", handleOpenFilters);
 
     return () => {
-      window.removeEventListener("sayo-focus-search", handleFocusSearch);
+      window.removeEventListener("sayo-search-query", handleSearchQuery as EventListener);
       window.removeEventListener("sayo-open-filters", handleOpenFilters);
     };
   }, []);
@@ -78,21 +79,14 @@ export const CategoryPage: React.FC = () => {
     return null;
   }
 
-  const hasActiveFilters = hiddenAllergens.length > 0 || highlightFilters.length > 0;
+  const hasActiveFilters = highlightFilters.length > 0;
 
   return (
     <main className="layout">
-      <section style={{ paddingTop: "3.2rem", paddingBottom: "0.5rem" }}>
+      <section className="category-page__header">
         <div className="container">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.75rem",
-            }}
-          >
+          <div className="category-page__heading-block">
             <header>
-              <div className="pill">{t("allItems")}</div>
               <h1
                 className="heading-xl"
                 style={{ margin: "0.7rem 0 0.15rem", fontSize: "1.6rem" }}
@@ -107,26 +101,8 @@ export const CategoryPage: React.FC = () => {
               </p>
             </header>
 
-            <SearchBar ref={searchInputRef} value={query} onChange={setQuery} />
-
             {hasActiveFilters && (
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "0.4rem",
-                  fontSize: "0.75rem",
-                }}
-              >
-                {hiddenAllergens.map((a) => (
-                  <span
-                    key={a}
-                    className="badge-outline"
-                    style={{ borderColor: "rgba(255,255,255,0.18)" }}
-                  >
-                    ✕ {t(a)}
-                  </span>
-                ))}
+              <div className="category-page__chips">
                 {highlightFilters.map((h) => (
                   <span
                     key={h}
@@ -138,6 +114,39 @@ export const CategoryPage: React.FC = () => {
                 ))}
               </div>
             )}
+
+            <div className="category-page__filters-bar">
+              <div className="category-page__filters-row">
+                <div className="category-page__filters-group">
+                  <div className="category-page__filters-title">
+                    {t("filters")}
+                  </div>
+                  <div className="category-page__filters-chips">
+                    {allFilterTags.map((tag) => {
+                      const active = highlightFilters.includes(tag);
+                      return (
+                        <button
+                          key={tag}
+                          type="button"
+                          className={`category-page__filter-pill ${
+                            active ? "category-page__filter-pill--active" : ""
+                          }`}
+                          onClick={() => {
+                            setHighlightFilters((current) =>
+                              current.includes(tag)
+                                ? current.filter((x) => x !== tag)
+                                : [...current, tag],
+                            );
+                          }}
+                        >
+                          {t(tag)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -145,38 +154,50 @@ export const CategoryPage: React.FC = () => {
       <section>
         <div className="container">
           <div
-            className="card-surface scroll-y-soft"
-            style={{
-              maxHeight: "calc(100vh - 210px)",
-              overflowY: "auto",
-              paddingInline: "1rem",
-              paddingTop: "0.2rem",
-              paddingBottom: "1rem",
-            }}
+            className="scroll-y-soft category-page__list-shell"
           >
-            {filteredItems.map((item, index) => (
-              <DishItem
-                key={item.id}
-                item={item}
-                index={index}
-                onOpen={() => setActiveItem(item)}
-              />
-            ))}
+            {filteredItems.length === 0 ? (
+              <p className="body-sm-muted" style={{ padding: "1rem 0.25rem" }}>
+                {query.trim() || highlightFilters.length
+                  ? t("noResultsWithFilters")
+                  : t("noItemsInCategory")}
+              </p>
+            ) : (
+              sections.map(([sectionName, sectionItems]) => (
+                <section key={sectionName || "default"} className="category-page__section">
+                  {sectionName && (
+                    <h2 className="category-page__section-title">{sectionName}</h2>
+                  )}
+                  <div className="category-page__section-grid">
+                    {sectionItems.map((item, index) => (
+                      <DishItem
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        onOpen={() => setActiveItem(item)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))
+            )}
           </div>
         </div>
       </section>
 
       <DishModal item={activeItem} onClose={() => setActiveItem(null)} />
 
+      <button
+        type="button"
+        className="category-page__filter-fab"
+        onClick={() => setFiltersOpen(true)}
+      >
+        {t("filters")}
+      </button>
+
       <FilterDrawer
         isOpen={filtersOpen}
         onClose={() => setFiltersOpen(false)}
-        hiddenAllergens={hiddenAllergens}
-        onToggleAllergen={(tag) =>
-          setHiddenAllergens((current) =>
-            current.includes(tag) ? current.filter((x) => x !== tag) : [...current, tag],
-          )
-        }
         highlightFilters={highlightFilters}
         onToggleHighlight={(tag) =>
           setHighlightFilters((current) =>

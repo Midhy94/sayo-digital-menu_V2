@@ -1,6 +1,27 @@
 export type DietaryTag = "dairy" | "nuts" | "gluten" | "honey";
 
-export type HighlightTag = "chefSpecial" | "popular" | "new";
+export type HighlightTag =
+  | "chefSpecial"
+  | "popular"
+  | "new"
+  | "chefSignature"
+  | "vegan"
+  | "vegetarian"
+  | "containsEgg"
+  | "nonVegetarian"
+  | "hot"
+  | "extraHot"
+  | "japan"
+  | "china"
+  | "thailand"
+  | "southKorea"
+  | "malaysia"
+  | "indonesia"
+  | "vietnam"
+  | "hawaii"
+  | "singapore"
+  | "india"
+  | "lebanon";
 
 export interface MenuItem {
   id: string;
@@ -9,6 +30,7 @@ export interface MenuItem {
   price: number;
   image?: string;
   categoryId: string;
+  section?: string;
   tags?: HighlightTag[];
   calories?: number;
   allergens?: DietaryTag[];
@@ -89,6 +111,7 @@ export const items: MenuItem[] = [
     description: "Line-caught tuna with yuzu kosho, pickled radish and smoked soy.",
     price: 85,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 220,
     tags: ["chefSpecial"],
     allergens: ["gluten"],
@@ -99,6 +122,7 @@ export const items: MenuItem[] = [
     description: "Compressed watermelon, chili oil and black sesame with shiso.",
     price: 62,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 180,
     tags: ["popular"],
   },
@@ -108,6 +132,7 @@ export const items: MenuItem[] = [
     description: "Delicate dumplings in roasted mushroom broth and truffle aroma.",
     price: 64,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 240,
     tags: ["chefSpecial", "popular"],
     allergens: ["gluten"],
@@ -118,6 +143,7 @@ export const items: MenuItem[] = [
     description: "Steamed bao with 12-hour short rib, pickled cucumber and gochujang mayo.",
     price: 72,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 320,
     tags: ["new"],
     allergens: ["gluten", "dairy"],
@@ -128,6 +154,7 @@ export const items: MenuItem[] = [
     description: "Signature vegetarian roll with carved watermelon, black rice and nori.",
     price: 68,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 210,
     tags: ["chefSpecial"],
   },
@@ -137,6 +164,7 @@ export const items: MenuItem[] = [
     description: "Norwegian salmon with ginger ponzu, daikon and chive oil.",
     price: 78,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 230,
     allergens: ["gluten"],
   },
@@ -146,6 +174,7 @@ export const items: MenuItem[] = [
     description: "Half lobster brushed with miso brown butter from the robata grill.",
     price: 165,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 540,
     tags: ["chefSpecial"],
     allergens: ["dairy"],
@@ -156,6 +185,7 @@ export const items: MenuItem[] = [
     description: "Baby corn with chili lime tare and smoked sea salt.",
     price: 54,
     categoryId: "food-menu",
+    section: "Warm",
     calories: 190,
     tags: ["popular"],
   },

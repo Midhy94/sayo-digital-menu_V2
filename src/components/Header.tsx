@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Theme } from "../hooks/useTheme";
+import { SearchBar } from "./SearchBar";
 
 interface HeaderProps {
   theme: Theme;
@@ -13,6 +15,8 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
   const { i18n, t } = useTranslation();
   const location = useLocation();
   const isCategoryPage = location.pathname.startsWith("/category/");
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
 
   const isArabic = i18n.language === "ar";
   const logoSrc =
@@ -39,111 +43,54 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
     window.dispatchEvent(new Event("sayo-focus-search"));
   };
 
-  const dispatchOpenFilters = () => {
-    window.dispatchEvent(new Event("sayo-open-filters"));
-  };
-
   return (
     <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: Number.parseInt(
-          getComputedStyle(document.documentElement).getPropertyValue("--z-navbar") || "100",
-          10,
-        ),
-        backdropFilter: scrolled ? "blur(16px)" : "none",
-        background: scrolled
-          ? theme === "dark"
-            ? "rgba(10,10,10,0.85)"
-            : "rgba(247,245,242,0.92)"
-          : "transparent",
-        borderBottom: scrolled ? "1px solid var(--color-border)" : "transparent",
-        borderBottomLeftRadius: scrolled ? 18 : 0,
-        borderBottomRightRadius: scrolled ? 18 : 0,
-      }}
+      className={`header ${scrolled ? "header--scrolled" : ""} ${
+        theme === "light" ? "header--light" : "header--dark"
+      }`}
     >
-      <div className="container" style={{ paddingBlock: "0.6rem" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1rem",
-          }}
-        >
-          <Link to="/" style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={logoSrc}
-              alt={t("restaurantName")}
-              style={{ height: 32, width: "auto", display: "block" }}
-            />
-          </Link>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
-            {isCategoryPage && (
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.94 }}
-                onClick={dispatchFocusSearch}
-                style={{
-                  borderRadius: 999,
-                  border: "1px solid var(--color-border)",
-                  padding: "0.35rem 0.8rem",
-                  background:
-                    theme === "dark"
-                      ? "rgba(15,15,15,0.92)"
-                      : "rgba(255,255,255,0.92)",
-                  color: "var(--color-text-primary)",
-                  fontSize: "0.75rem",
-                }}
-              >
-                {t("searchResults")}
-              </motion.button>
-            )}
+      <div className="container">
+        <div className="header__inner">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={logoSrc}
+                alt={t("restaurantName")}
+                style={{ height: 32, width: "auto", display: "block" }}
+              />
+            </Link>
 
             {isCategoryPage && (
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.94 }}
-                onClick={dispatchOpenFilters}
-                style={{
-                  borderRadius: 999,
-                  border: "1px solid var(--color-border)",
-                  padding: "0.35rem 0.8rem",
-                  background:
-                    theme === "dark"
-                      ? "rgba(15,15,15,0.92)"
-                      : "rgba(255,255,255,0.92)",
-                  color: "var(--color-text-primary)",
-                  fontSize: "0.75rem",
-                }}
+                onClick={() => navigate(-1)}
+                className="header__chip"
               >
-                {t("filters")}
+                ← {t("categoriesTitle")}
               </motion.button>
             )}
+          </div>
 
+          <div className="header__actions">
+            {isCategoryPage && (
+              <div style={{ maxWidth: 220, flex: 1 }}>
+                <SearchBar
+                  value={searchValue}
+                  onChange={(value) => {
+                    setSearchValue(value);
+                    window.dispatchEvent(
+                      new CustomEvent("sayo-search-query", { detail: value }),
+                    );
+                  }}
+                />
+              </div>
+            )}
             <motion.button
               type="button"
               whileTap={{ scale: 0.94 }}
               onClick={toggleLanguage}
-              style={{
-                borderRadius: 999,
-                border: "1px solid var(--color-border)",
-                padding: "0.35rem 0.8rem",
-                background:
-                  theme === "dark"
-                    ? "rgba(15,15,15,0.92)"
-                    : "rgba(255,255,255,0.92)",
-                color: "var(--color-text-primary)",
-                fontSize: "0.75rem",
-              }}
+              className="header__lang"
             >
               {i18n.language === "ar" ? "EN" : "AR"}
             </motion.button>
@@ -153,21 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
               whileTap={{ scale: 0.94 }}
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 999,
-                border: "1px solid var(--color-border)",
-                background:
-                  theme === "dark"
-                    ? "rgba(15,15,15,0.92)"
-                    : "rgba(255,255,255,0.92)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--color-text-primary)",
-                fontSize: "0.9rem",
-              }}
+              className="header__theme"
             >
               {theme === "dark" ? "☾" : "☼"}
             </motion.button>

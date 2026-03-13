@@ -11,23 +11,10 @@ export const SearchBar = forwardRef<HTMLInputElement, Props>(
   const { t } = useTranslation();
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.6rem",
-        padding: "0.55rem 0.9rem",
-        borderRadius: 999,
-        border: "1px solid var(--color-border)",
-        background: "var(--color-background-secondary)",
-      }}
-    >
+    <div className="search-bar">
       <span
         aria-hidden
-        style={{
-          fontSize: "0.9rem",
-          color: "var(--color-text-secondary)",
-        }}
+        className="search-bar__icon"
       >
         ⌕
       </span>
@@ -36,14 +23,7 @@ export const SearchBar = forwardRef<HTMLInputElement, Props>(
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t("searchPlaceholder")}
-        style={{
-          flex: 1,
-          border: "none",
-          outline: "none",
-          background: "transparent",
-          color: "var(--color-text-primary)",
-          fontSize: "0.88rem",
-        }}
+        className="search-bar__input"
       />
     </div>
   );

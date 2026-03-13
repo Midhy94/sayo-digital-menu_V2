@@ -8,6 +8,13 @@ interface Props {
   index: number;
 }
 
+const allergenIcons: Record<string, string> = {
+  dairy: "🥛",
+  nuts: "🌰",
+  gluten: "🌾",
+  honey: "🍯",
+};
+
 export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
   const { t } = useTranslation();
 
@@ -18,6 +25,11 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
         new: t("new"),
       }[item.tags[0]]
     : undefined;
+
+  const allergenRow =
+    item.allergens && item.allergens.length
+      ? item.allergens.map((a) => allergenIcons[a] || "●").join(" ")
+      : "";
 
   return (
     <motion.button
@@ -38,13 +50,15 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1.9fr) 76px",
-          gap: "0.85rem",
-          paddingBlock: "0.8rem",
-          borderBottom: "1px solid var(--color-border)",
+          gridTemplateColumns: "minmax(0, 1.9fr) 110px",
+          gap: "0.9rem",
+          padding: "1rem 1.1rem",
+          borderRadius: "12px",
+          border: "1px solid rgba(0, 0, 0, 0.04)",
+          backgroundColor: "var(--color-background-secondary)",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
           <div
             style={{
               display: "flex",
@@ -54,7 +68,9 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
           >
             <div
               className="heading-lg"
-              style={{ fontSize: "0.98rem", letterSpacing: "0.04em" }}
+              style={{
+                fontSize: "0.98rem",
+              }}
             >
               {item.name}
             </div>
@@ -75,20 +91,21 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
             className="body-sm-muted"
             style={{
               margin: 0,
-              fontSize: "0.8rem",
+              fontSize: "0.82rem",
             }}
           >
             {item.description}
           </p>
-          {item.calories && (
-            <span
+          {allergenRow && (
+            <div
               style={{
-                fontSize: "0.72rem",
-                color: "var(--color-text-secondary)",
+                marginTop: "0.2rem",
+                fontSize: "0.8rem",
+                opacity: 0.6,
               }}
             >
-              {item.calories} {t("calories")}
-            </span>
+              {allergenRow}
+            </div>
           )}
         </div>
 
@@ -98,26 +115,25 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
             flexDirection: "column",
             alignItems: "flex-end",
             justifyContent: "space-between",
-            gap: "0.4rem",
+            gap: "0.5rem",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-heading)",
               fontSize: "0.95rem",
-              letterSpacing: "0.08em",
             }}
           >
-            {item.price.toFixed(0)} SAR
+            ﷼ {item.price.toFixed(0)}
           </div>
           <div
             style={{
-              borderRadius: "var(--radius-md)",
+              borderRadius: "8px",
               overflow: "hidden",
               width: "100%",
-              minHeight: 56,
+              minHeight: 70,
               backgroundImage:
-                "linear-gradient(135deg, rgba(201,164,108,0.22), transparent 60%), url('https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?auto=compress&cs=tinysrgb&w=600')",
+                "url('https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?auto=compress&cs=tinysrgb&w=600')",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
