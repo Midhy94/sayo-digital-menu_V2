@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { Theme } from "../hooks/useTheme";
+import { AppIcon } from "./AppIcon";
 
 export const Footer: React.FC = () => {
   const year = new Date().getFullYear();
@@ -28,28 +29,7 @@ export const Footer: React.FC = () => {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <div className="footer__icon footer__icon--round">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M13.5 8H15V5.5h-1.8C10.9 5.5 10 7.1 10 9.2V11H8v2.5h2v5.1h2.6V13.5H15L15.5 11H12v-1.6c0-.9.3-1.4 1.5-1.4Z"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="8.5"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                />
-              </svg>
+              <AppIcon name="facebook" size={20} strokeWidth={2} />
             </div>
           </a>
           <a
@@ -58,31 +38,7 @@ export const Footer: React.FC = () => {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <div className="footer__icon footer__icon--round">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="6"
-                  y="6"
-                  width="12"
-                  height="12"
-                  rx="4"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="3.3"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                />
-                <circle cx="16" cy="8" r="0.8" fill="currentColor" />
-              </svg>
+              <AppIcon name="instagram" size={20} strokeWidth={2} />
             </div>
           </a>
           <a
@@ -91,25 +47,7 @@ export const Footer: React.FC = () => {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <div className="footer__icon footer__icon--round">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="8.5"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                />
-                <path
-                  d="M11 10.5v3l3-1.5-3-1.5Z"
-                  fill="currentColor"
-                />
-              </svg>
+              <AppIcon name="youtube" size={20} strokeWidth={2} />
             </div>
           </a>
         </div>

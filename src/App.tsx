@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { IconoirProvider } from "iconoir-react";
 import { Header } from "./components/Header";
 import { HomePage } from "./pages/HomePage";
 import { CategoryPage } from "./pages/CategoryPage";
 import { useTheme } from "./hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
+import { FilterProvider } from "./context/FilterContext";
+import { iconDefaultProps } from "./components/AppIcon";
 
 const AppShell: React.FC = () => {
   const [theme, setTheme] = useTheme();
@@ -28,6 +31,8 @@ const AppShell: React.FC = () => {
   }, [i18n.language]);
 
   return (
+    <IconoirProvider iconProps={iconDefaultProps}>
+    <FilterProvider>
     <div className="app-root">
       <Header
         theme={theme}
@@ -36,6 +41,7 @@ const AppShell: React.FC = () => {
       />
       <AnimatePresence mode="wait">
         <motion.div
+          className="app-content"
           key={location.pathname}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,6 +55,8 @@ const AppShell: React.FC = () => {
         </motion.div>
       </AnimatePresence>
     </div>
+    </FilterProvider>
+    </IconoirProvider>
   );
 };
 

@@ -1,6 +1,31 @@
 import { motion } from "framer-motion";
 import type { MenuItem } from "../data/menuData";
+import type { DietaryTag } from "../data/menuData";
 import { useTranslation } from "react-i18next";
+import { getCountryCodeForItem, isVegetarianSection, countryCodeToFlag } from "../data/menuData";
+import { AppIcon, getDietaryIconName } from "./AppIcon";
+import { IconWithTooltip } from "./IconWithTooltip";
+
+const COUNTRY_CODE_TO_I18N: Record<string, string> = {
+  IN: "india",
+  JP: "japan",
+  TH: "thailand",
+  CN: "china",
+  KR: "southKorea",
+  LB: "lebanon",
+  VN: "vietnam",
+  MY: "malaysia",
+  ID: "indonesia",
+  SG: "singapore",
+  SA: "countrySA",
+};
+
+const SPICE_LABELS: Record<number, string> = {
+  0: "spiceLevelMild",
+  1: "spiceLevelMedium",
+  2: "spiceLevelHot",
+  3: "spiceLevelExtraHot",
+};
 
 interface Props {
   item: MenuItem;
@@ -8,28 +33,24 @@ interface Props {
   index: number;
 }
 
-const allergenIcons: Record<string, string> = {
-  dairy: "🥛",
-  nuts: "🌰",
-  gluten: "🌾",
-  honey: "🍯",
-};
-
 export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
   const { t } = useTranslation();
 
-  const tagLabel = item.tags?.[0]
+  const firstTag = item.tags?.[0];
+  const tagLabel = firstTag
     ? {
         chefSpecial: t("chefSpecial"),
+        chefSignature: t("chefSignature"),
         popular: t("popular"),
         new: t("new"),
-      }[item.tags[0]]
+      }[firstTag]
     : undefined;
+  const isChefSignature = firstTag === "chefSignature";
 
-  const allergenRow =
-    item.allergens && item.allergens.length
-      ? item.allergens.map((a) => allergenIcons[a] || "●").join(" ")
-      : "";
+  const allergenList = item.allergens ?? [];
+  const countryCode = getCountryCodeForItem(item);
+  const isVegetarian = isVegetarianSection(item.section);
+  const spiceLevel = item.spiceLevel ?? (item.tags?.includes("extraHot") ? 3 : item.tags?.includes("hot") ? 2 : undefined);
 
   return (
     <motion.button
@@ -47,97 +68,73 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
         padding: 0,
       }}
     >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1.9fr) 110px",
-          gap: "0.9rem",
-          padding: "1rem 1.1rem",
-          borderRadius: "12px",
-          border: "1px solid rgba(0, 0, 0, 0.04)",
-          backgroundColor: "var(--color-background-secondary)",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.45rem",
-            }}
-          >
-            <div
-              className="heading-lg"
-              style={{
-                fontSize: "0.98rem",
-              }}
-            >
-              {item.name}
-            </div>
-            {tagLabel && (
-              <span
-                className="badge-outline"
-                style={{
-                  borderColor: "rgba(201,164,108,0.9)",
-                  fontSize: "0.65rem",
-                  paddingInline: "0.5rem",
-                }}
-              >
-                {tagLabel}
+      <div className={`dish-item__card ${isChefSignature ? "dish-item__card--signature" : ""}`}>
+        <div className="dish-item__image" />
+        <div className="dish-item__content">
+          <div className="dish-item__title-row">
+            <h3 className="dish-item__heading">{item.name}</h3>
+            <div className="dish-item__price-wrap">
+              <AppIcon name="price" size={14} strokeWidth={2} className="dish-item__price-icon" aria-hidden />
+              <span className="price dish-item__price">
+                {typeof item.price === "string" ? item.price : item.price.toFixed(0)}
               </span>
+            </div>
+          </div>
+          {tagLabel && (
+            <span
+              className={`dish-item__pill ${isChefSignature ? "dish-item__pill--signature" : ""}`}
+            >
+              {isChefSignature && (
+                <AppIcon name="chefSignature" size={12} strokeWidth={2} className="dish-item__pill-icon" aria-hidden />
+              )}
+              {tagLabel}
+            </span>
+          )}
+          <p className="dish-item__description">{item.description}</p>
+          <div className="dish-item__meta">
+            {countryCode && (
+              <IconWithTooltip
+                label={COUNTRY_CODE_TO_I18N[countryCode] ? t(COUNTRY_CODE_TO_I18N[countryCode]) : countryCode}
+              >
+                <span className="dish-item__flag" aria-hidden>{countryCodeToFlag(countryCode)}</span>
+              </IconWithTooltip>
+            )}
+            {isVegetarian && (
+              <IconWithTooltip label={t("vegetarianDish")}>
+                <AppIcon name="vegetarian" size={16} strokeWidth={2} className="dish-item__veg-icon" aria-hidden />
+              </IconWithTooltip>
+            )}
+            {spiceLevel != null && (
+              <IconWithTooltip label={t(SPICE_LABELS[spiceLevel] ?? "spiceLevelMild")}>
+                <span className="dish-item__spice" aria-hidden>
+                  {[1, 2, 3].slice(0, Math.max(1, spiceLevel + 1)).map((i) => (
+                    <AppIcon key={i} name="hot" size={12} strokeWidth={2} aria-hidden />
+                  ))}
+                </span>
+              </IconWithTooltip>
+            )}
+            {item.calories != null && (
+              <IconWithTooltip label={`${item.calories} ${t("calories")}`}>
+                <span className="dish-item__calories-wrap">
+                  <AppIcon name="calories" size={14} strokeWidth={2} className="dish-item__calories-icon" aria-hidden />
+                  <span className="dish-item__calories">{item.calories} {t("calories")}</span>
+                </span>
+              </IconWithTooltip>
             )}
           </div>
-          <p
-            className="body-sm-muted"
-            style={{
-              margin: 0,
-              fontSize: "0.82rem",
-            }}
-          >
-            {item.description}
-          </p>
-          {allergenRow && (
-            <div
-              style={{
-                marginTop: "0.2rem",
-                fontSize: "0.8rem",
-                opacity: 0.6,
-              }}
-            >
-              {allergenRow}
+          {allergenList.length > 0 && (
+            <div className="dish-item__allergens">
+              {allergenList.map((a) => (
+                <AppIcon
+                  key={a}
+                  name={getDietaryIconName(a as DietaryTag)}
+                  size={14}
+                  strokeWidth={2}
+                  aria-hidden
+                />
+              ))}
             </div>
           )}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            gap: "0.5rem",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "0.95rem",
-            }}
-          >
-            ﷼ {item.price.toFixed(0)}
-          </div>
-          <div
-            style={{
-              borderRadius: "8px",
-              overflow: "hidden",
-              width: "100%",
-              minHeight: 70,
-              backgroundImage:
-                "url('https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?auto=compress&cs=tinysrgb&w=600')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
         </div>
       </div>
     </motion.button>

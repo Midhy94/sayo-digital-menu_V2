@@ -1,6 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { MenuItem } from "../data/menuData";
 import { useTranslation } from "react-i18next";
+import { getCountryCodeForItem, isVegetarianSection, countryCodeToFlag } from "../data/menuData";
+import { AppIcon } from "./AppIcon";
+
+const COUNTRY_CODE_TO_I18N: Record<string, string> = {
+  IN: "india", JP: "japan", TH: "thailand", CN: "china", KR: "southKorea",
+  LB: "lebanon", VN: "vietnam", MY: "malaysia", ID: "indonesia", SG: "singapore", SA: "countrySA",
+};
 
 interface Props {
   item: MenuItem | null;
@@ -9,6 +16,9 @@ interface Props {
 
 export const DishModal: React.FC<Props> = ({ item, onClose }) => {
   const { t } = useTranslation();
+  const isChefSignature = item?.tags?.includes("chefSignature");
+  const countryCode = item ? getCountryCodeForItem(item) : undefined;
+  const isVegetarian = item ? isVegetarianSection(item.section) : false;
 
   return (
     <AnimatePresence>
@@ -99,7 +109,13 @@ export const DishModal: React.FC<Props> = ({ item, onClose }) => {
                 }}
               >
                 <div>
-                  <h2 className="heading-lg" style={{ margin: 0, fontSize: "1.2rem" }}>
+                  {isChefSignature && (
+                    <span className="dish-modal__signature-badge">
+                      <AppIcon name="chefSignature" size={14} strokeWidth={2} aria-hidden />
+                      {t("chefSignature")}
+                    </span>
+                  )}
+                  <h2 className="card-heading" style={{ margin: 0, fontSize: "1.2rem" }}>
                     {item.name}
                   </h2>
                   <p
@@ -109,13 +125,9 @@ export const DishModal: React.FC<Props> = ({ item, onClose }) => {
                     {item.description}
                   </p>
                 </div>
-                <div
-                  style={{
-                    textAlign: "right",
-                    fontFamily: "var(--font-heading)",
-                  }}
-                >
-                  {item.price.toFixed(0)} SAR
+                <div className="dish-modal__price-wrap" style={{ textAlign: "right" }}>
+                  <AppIcon name="price" size={18} strokeWidth={2} aria-hidden />
+                  <span className="price">{typeof item.price === "string" ? item.price : item.price.toFixed(0)}</span>
                 </div>
               </div>
             </div>
@@ -127,8 +139,21 @@ export const DishModal: React.FC<Props> = ({ item, onClose }) => {
                 gap: "0.7rem",
               }}
             >
-              {item.calories && (
-                <div className="body-sm-muted">
+              <div className="dish-modal__meta">
+                {countryCode && (
+                  <span className="dish-modal__meta-item" title={COUNTRY_CODE_TO_I18N[countryCode] ? t(COUNTRY_CODE_TO_I18N[countryCode]) : countryCode}>
+                    <span className="dish-modal__flag">{countryCodeToFlag(countryCode)}</span>
+                  </span>
+                )}
+                {isVegetarian && (
+                  <span className="dish-modal__meta-item dish-modal__veg" title={t("vegetarianDish")}>
+                    <AppIcon name="vegetarian" size={18} strokeWidth={2} aria-hidden />
+                  </span>
+                )}
+              </div>
+              {item.calories != null && (
+                <div className="dish-modal__calories-wrap body-sm-muted">
+                  <AppIcon name="calories" size={18} strokeWidth={2} className="dish-modal__calories-icon" aria-hidden />
                   {item.calories} {t("calories")}
                 </div>
               )}

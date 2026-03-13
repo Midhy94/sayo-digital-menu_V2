@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Theme } from "../hooks/useTheme";
 import { SearchBar } from "./SearchBar";
+import { SearchMegaDropdown } from "./SearchMegaDropdown";
+import { AppIcon } from "./AppIcon";
 
 interface HeaderProps {
   theme: Theme;
@@ -17,6 +19,15 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
   const isCategoryPage = location.pathname.startsWith("/category/");
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [dropdownTop, setDropdownTop] = useState(56);
+  const searchAnchorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!filterDropdownOpen || !searchAnchorRef.current) return;
+    const rect = searchAnchorRef.current.getBoundingClientRect();
+    setDropdownTop(rect.bottom + 4);
+  }, [filterDropdownOpen]);
 
   const isArabic = i18n.language === "ar";
   const logoSrc =
@@ -52,6 +63,17 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
       <div className="container">
         <div className="header__inner">
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            {isCategoryPage && (
+              <motion.button
+                type="button"
+                aria-label={t("categoriesTitle")}
+                whileTap={{ scale: 0.94 }}
+                onClick={() => navigate(-1)}
+                className="header__back"
+              >
+                <AppIcon name="arrowLeft" size={18} className="header__back-icon" />
+              </motion.button>
+            )}
             <Link to="/" style={{ display: "flex", alignItems: "center" }}>
               <img
                 src={logoSrc}
@@ -59,22 +81,20 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
                 style={{ height: 32, width: "auto", display: "block" }}
               />
             </Link>
-
-            {isCategoryPage && (
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.94 }}
-                onClick={() => navigate(-1)}
-                className="header__chip"
-              >
-                ← {t("categoriesTitle")}
-              </motion.button>
-            )}
           </div>
 
           <div className="header__actions">
             {isCategoryPage && (
-              <div style={{ maxWidth: 220, flex: 1 }}>
+              <div
+                ref={searchAnchorRef}
+                className="header__search-wrap"
+                style={{
+                  position: "relative",
+                  flex: 1,
+                  maxWidth: 380,
+                  minWidth: 260,
+                }}
+              >
                 <SearchBar
                   value={searchValue}
                   onChange={(value) => {
@@ -83,6 +103,13 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
                       new CustomEvent("sayo-search-query", { detail: value }),
                     );
                   }}
+                  onFocus={() => setFilterDropdownOpen(true)}
+                />
+                <SearchMegaDropdown
+                  isOpen={filterDropdownOpen}
+                  onClose={() => setFilterDropdownOpen(false)}
+                  anchorRef={searchAnchorRef}
+                  top={dropdownTop}
                 />
               </div>
             )}
@@ -102,7 +129,11 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
               aria-label="Toggle theme"
               className="header__theme"
             >
-              {theme === "dark" ? "☾" : "☼"}
+              {theme === "dark" ? (
+                <AppIcon name="moon" size={18} className="header__theme-icon" />
+              ) : (
+                <AppIcon name="sun" size={18} className="header__theme-icon" />
+              )}
             </motion.button>
           </div>
         </div>
