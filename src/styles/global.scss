@@ -168,10 +168,11 @@ body {
   color: var(--color-text-secondary);
 }
 
-/* Item pricing – Inter Bold */
+/* Item pricing – Inter Bold; explicit color so iOS/Safari don't show blue */
 .price {
   font-family: var(--font-body);
   font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 .badge-outline {
@@ -1086,6 +1087,7 @@ body {
 
 .dish-item__price {
   font-size: 0.95rem;
+  color: var(--color-text-primary);
 }
 
 .dish-item__meta {
@@ -1290,6 +1292,7 @@ body {
 
 .dish-modal__price {
   font-size: 1.05rem;
+  color: var(--color-text-primary);
 }
 
 .dish-modal__attributes {
@@ -1344,6 +1347,7 @@ body {
 .dish-modal__detail-row--price .dish-modal__detail-value {
   font-weight: 700;
   font-size: 1rem;
+  color: var(--color-text-primary);
 }
 
 .dish-modal__detail-label {
