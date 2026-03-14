@@ -945,10 +945,12 @@ body {
 .category-page__list-shell {
   padding-top: 0.2rem;
   padding-bottom: 1rem;
+  scroll-margin-top: 5.5rem; /* leave room for sticky header so heading is visible */
 }
 
 .category-page__section {
   margin-bottom: 1.8rem;
+  scroll-margin-top: 5.5rem; /* leave room for sticky header so section title is visible */
 }
 
 .category-page__section-title {

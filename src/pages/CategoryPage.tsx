@@ -306,6 +306,7 @@ export const CategoryPage: React.FC = () => {
                       type="button"
                       className={`category-page__floating-nav-item ${selectedClassification === null ? "category-page__floating-nav-item--active" : ""}`}
                       onClick={() => {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                         flushSync(() => setSelectedClassification(null));
                         setFloatingNavOpen(false);
                         setTimeout(() => {
@@ -322,6 +323,7 @@ export const CategoryPage: React.FC = () => {
                         type="button"
                         className={`category-page__floating-nav-item ${(selectedClassification || "").trim() === (name || "").trim() ? "category-page__floating-nav-item--active" : ""}`}
                         onClick={() => {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
                           const value = String(name).trim() || null;
                           flushSync(() => setSelectedClassification(value));
                           setFloatingNavOpen(false);

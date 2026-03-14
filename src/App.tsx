@@ -30,6 +30,10 @@ const AppShell: React.FC = () => {
     document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
   }, [i18n.language]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <IconoirProvider iconProps={iconDefaultProps}>
     <FilterProvider>
