@@ -78,15 +78,16 @@ export function CustomDropdown({
       </button>
       <AnimatePresence>
         {open && (
-          <motion.ul
-            className="custom-dropdown__list"
-            role="listbox"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
-          >
-            {options.map((opt) => (
+          <div className="custom-dropdown__list-wrap">
+            <motion.ul
+              className="custom-dropdown__list"
+              role="listbox"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
+            >
+              {options.map((opt) => (
               <li key={opt.value ?? "__all__"} role="option" aria-selected={value === opt.value}>
                 <button
                   type="button"
@@ -99,8 +100,9 @@ export function CustomDropdown({
                   {opt.label}
                 </button>
               </li>
-            ))}
-          </motion.ul>
+              ))}
+            </motion.ul>
+          </div>
         )}
       </AnimatePresence>
     </div>

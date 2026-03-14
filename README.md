@@ -160,13 +160,17 @@ The app is a **static site**. After `npm run build`, upload the contents of the 
    **Publish directory:** `dist`
 4. Deploy. Use the generated URL (e.g. `random-name.netlify.app`) or add a custom domain in **Domain settings**.
 
-#### Option C – Manual upload (your own domain / cPanel)
+#### Option C – Manual upload (your own domain / cPanel, FTP)
 
 1. Run `npm run build`.
-2. Upload **everything inside** the `dist/` folder to your host’s **web root** (e.g. `public_html` or the folder your domain points to).
-3. Ensure the server is configured for a **single-page app**: all routes (e.g. `/category/sushi`) should serve `index.html` so React Router works.  
-   - **Apache:** add a `.htaccess` with `FallbackResource /index.html` in the same folder as `index.html`.  
-   - **Nginx:** `try_files $uri $uri/ /index.html;`
+2. Upload the **contents** of the `dist/` folder (not the `dist` folder itself) into your **web root** (e.g. `public_html`).  
+   After upload, the root should contain:
+   - `index.html` (in the root)
+   - `assets/` folder (with `.js`, `.css`, logos, favicon)
+   - `.htaccess` (included from `public/`, so Apache serves the SPA correctly)
+3. **Wrong:** uploading the `dist` folder so the URL is `yoursite.com/dist/` — the app uses paths like `/assets/...`, so nothing will load.  
+   **Right:** upload so `yoursite.com` opens `index.html` and `yoursite.com/assets/...` finds the files.
+4. If your host uses **Nginx** instead of Apache, configure: `try_files $uri $uri/ /index.html;`
 
 #### Custom domain (Vercel / Netlify)
 
