@@ -177,6 +177,7 @@ The app is a **static site**. After `npm run build`, upload the contents of the 
 
 ### File Map (Key Paths)
 
+- `public/assets/` – static assets copied as-is into the build (logos, favicon). Use paths like `/assets/Logo_EN.svg` in code. Do not put these in a root-level `assets/` folder or they will not be included in the deployed site.
 - `src/design/tokens.css` – design tokens (colors, typography, spacing, radius, shadows, z-index, themes)
 - `src/styles/global.css` – global layout styles and shared utility classes
 - `src/i18n/config.ts` – i18next + react-i18next configuration (EN/AR)
