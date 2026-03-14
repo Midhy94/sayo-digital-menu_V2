@@ -11,34 +11,16 @@ export const CategoryGrid: React.FC = () => {
 
   return (
     <>
-      <section style={{ paddingBottom: "2.5rem" }}>
+      <section className="category-grid__section">
         <div className="container">
-        {mainCategories.length > 0 && (
+          {mainCategories.length > 0 && (
           <>
-            <h2
-              className="heading-lg"
-              style={{
-                margin: "0 0 0.75rem",
-                fontSize: "1.05rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
+            <h2 className="heading-lg category-grid__heading">
               Menus
             </h2>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "1rem",
-                marginBottom: "1.6rem",
-              }}
-            >
+            <div className="category-grid__row">
               {mainCategories.map((category, index) => (
-                <div
-                  key={category.id}
-                  style={{ flex: "0 1 220px", maxWidth: 260 }}
-                >
+                <div key={category.id} className="category-grid__item">
                   <CategoryCard category={category} index={index} />
                 </div>
               ))}
@@ -46,32 +28,14 @@ export const CategoryGrid: React.FC = () => {
           </>
         )}
 
-        {specialCategories.length > 0 && (
+          {specialCategories.length > 0 && (
           <>
-            <h3
-              className="heading-lg"
-              style={{
-                margin: "0 0 0.75rem",
-                fontSize: "0.95rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
+            <h3 className="heading-lg category-grid__heading">
               Special Menus
             </h3>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "1rem",
-                marginBottom: "1.6rem",
-              }}
-            >
+            <div className="category-grid__row">
               {specialCategories.map((category, index) => (
-                <div
-                  key={category.id}
-                  style={{ flex: "0 1 220px", maxWidth: 260 }}
-                >
+                <div key={category.id} className="category-grid__item">
                   <CategoryCard category={category} index={index} />
                 </div>
               ))}
@@ -79,31 +43,14 @@ export const CategoryGrid: React.FC = () => {
           </>
         )}
 
-        {festiveCategories.length > 0 && (
+          {festiveCategories.length > 0 && (
           <>
-            <h3
-              className="heading-lg"
-              style={{
-                margin: "0 0 0.75rem",
-                fontSize: "0.95rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
+            <h3 className="heading-lg category-grid__heading">
               Festive Menus
             </h3>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "1rem",
-              }}
-            >
+            <div className="category-grid__row">
               {festiveCategories.map((category, index) => (
-                <div
-                  key={category.id}
-                  style={{ flex: "0 1 220px", maxWidth: 260 }}
-                >
+                <div key={category.id} className="category-grid__item">
                   <CategoryCard category={category} index={index} />
                 </div>
               ))}
@@ -112,7 +59,7 @@ export const CategoryGrid: React.FC = () => {
         )}
         </div>
       </section>
-      <section style={{ paddingBottom: "2.5rem" }}>
+      <section className="category-grid__section">
         <div className="container">
           <div
             style={{
@@ -128,8 +75,6 @@ export const CategoryGrid: React.FC = () => {
               style={{
                 margin: 0,
                 fontSize: "1.1rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
               }}
             >
               SAYO Jubail

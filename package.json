@@ -11,6 +11,7 @@
   "dependencies": {
     "framer-motion": "^11.11.1",
     "i18next": "^23.11.5",
+    "iconoir-react": "^7.11.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^15.0.0",
@@ -25,6 +26,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "postcss": "^8.4.49",
+    "sass": "^1.98.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"
   }

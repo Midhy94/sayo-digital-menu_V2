@@ -1,16 +1,27 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
-const slides = [
+type Slide =
+  | { id: number; type: "image"; src: string }
+  | { id: number; type: "video"; src: string; poster?: string };
+
+const slides: Slide[] = [
   {
     id: 1,
-    image:
-      "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    type: "image",
+    src: "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1600",
   },
   {
     id: 2,
-    image:
+    type: "image",
+    src: "https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  },
+  {
+    id: 3,
+    type: "video",
+    src: "https://www.pexels.com/download/video/5223104/",
+    poster:
       "https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?auto=compress&cs=tinysrgb&w=1600",
   },
 ];
@@ -18,26 +29,37 @@ const slides = [
 export const HeroBanner: React.FC = () => {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
+  const intervalRef = useRef<number | null>(null);
 
-  const goNext = () => setIndex((prev) => (prev + 1) % slides.length);
-  const goPrev = () => setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  const goNext = useCallback(
+    () => setIndex((prev) => (prev + 1) % slides.length),
+    []
+  );
+
+  const goPrev = useCallback(
+    () => setIndex((prev) => (prev - 1 + slides.length) % slides.length),
+    []
+  );
+
+  const resetAutoSlide = useCallback(() => {
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+    }
+    intervalRef.current = window.setInterval(goNext, 8000);
+  }, [goNext]);
+
+  useEffect(() => {
+    resetAutoSlide();
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+      }
+    };
+  }, [resetAutoSlide]);
 
   return (
-    <section
-      style={{
-        position: "relative",
-        paddingTop: "3.6rem",
-        paddingBottom: 0,
-      }}
-    >
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "min(60vh, 420px)",
-          overflow: "hidden",
-        }}
-      >
+    <section className="hero">
+      <div className="hero__media">
         <AnimatePresence mode="wait">
           <motion.div
             key={slides[index].id}
@@ -45,14 +67,31 @@ export const HeroBanner: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage: `url('${slides[index].image}')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
+            style={{ position: "absolute", inset: 0 }}
+          >
+            {slides[index].type === "image" ? (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundImage: `url('${slides[index].src}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            ) : (
+              <video
+                key={slides[index].id}
+                src={slides[index].src}
+                poster={slides[index].poster}
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            )}
+          </motion.div>
         </AnimatePresence>
         <div
           style={{
@@ -64,56 +103,26 @@ export const HeroBanner: React.FC = () => {
         />
         <button
           type="button"
-          onClick={goPrev}
-          aria-label="Previous slide"
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "1.2rem",
-            transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.45)",
-            borderRadius: "999px",
-            border: "none",
-            width: 32,
-            height: 32,
-            color: "#ffffff",
+          onClick={() => {
+            goPrev();
+            resetAutoSlide();
           }}
+          aria-label="Previous slide"
+          className="hero__arrow hero__arrow--prev"
         >
           ‹
         </button>
         <button
           type="button"
-          onClick={goNext}
-          aria-label="Next slide"
-          style={{
-            position: "absolute",
-            top: "50%",
-            right: "1.2rem",
-            transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.45)",
-            borderRadius: "999px",
-            border: "none",
-            width: 32,
-            height: 32,
-            color: "#ffffff",
+          onClick={() => {
+            goNext();
+            resetAutoSlide();
           }}
+          aria-label="Next slide"
+          className="hero__arrow hero__arrow--next"
         >
           ›
         </button>
-      </div>
-      <div className="container" style={{ marginTop: "1.4rem" }}>
-        <p
-          className="body-sm-muted"
-          style={{
-            margin: 0,
-            textAlign: "center",
-            fontSize: "0.85rem",
-            lineHeight: 1.6,
-            letterSpacing: "0.06em",
-          }}
-        >
-          {t("restaurantName")} — {t("restaurantSubtitle")}
-        </p>
       </div>
     </section>
   );
