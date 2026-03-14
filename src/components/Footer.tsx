@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
   const year = new Date().getFullYear();
   const { i18n } = useTranslation();
 
-  const theme = (document.documentElement.dataset.theme as Theme) || "dark";
+  const theme = (document.documentElement.dataset.theme as Theme) || "light";
   const isArabic = i18n.language === "ar";
   const logoSrc =
     theme === "light"

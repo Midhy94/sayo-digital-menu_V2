@@ -1,13 +1,13 @@
 :root {
-  /* Color tokens - dark theme defaults */
+  /* Color tokens - dark theme (user must switch to dark) */
   --color-background-primary: #0f0f0f;
-  --color-background-secondary: #1a1a1a;
+  --color-background-secondary: #0a0a0a;
   --color-accent-primary: #c9a46c;
   --color-accent-secondary: #e2c48e;
   --color-text-primary: #ffffff;
   --color-text-secondary: #cfcfcf;
   --color-border: #2a2a2a;
-  --color-surface-elevated: #151515;
+  --color-surface-elevated: #0c0c0c;
 
   /* Typography */
   --font-display: "Playfair Display", system-ui, -apple-system, BlinkMacSystemFont,
