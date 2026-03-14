@@ -29,6 +29,8 @@ import {
   TaskList,
   Check,
   Circle,
+  Plus,
+  Minus,
 } from "iconoir-react";
 import type { DietaryTag, HighlightTag } from "../data/menuData";
 import { SaudiRiyalIcon } from "./SaudiRiyalIcon";
@@ -83,7 +85,9 @@ export type IconName =
   | "calories"
   | "viewGrid"
   | "viewList"
-  | "categoryList";
+  | "categoryList"
+  | "plus"
+  | "minus";
 
 const ICON_MAP: Record<IconName, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   search: Search,
@@ -117,6 +121,8 @@ const ICON_MAP: Record<IconName, React.ComponentType<React.SVGProps<SVGSVGElemen
   categoryList: TaskList,
   check: Check,
   circle: Circle,
+  plus: Plus,
+  minus: Minus,
 };
 
 export function AppIcon({

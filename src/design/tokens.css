@@ -46,7 +46,7 @@
 
 /* Light theme overrides */
 :root[data-theme="light"] {
-  --color-background-primary: #f7f5f2;
+  --color-background-primary: #FAF8F5;
   --color-background-secondary: #ffffff;
   --color-surface-elevated: #ffffff;
   --color-text-primary: #161616;

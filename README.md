@@ -140,6 +140,41 @@ Helper functions:
 
 ---
 
+### Deploying to a Domain (client demo / production)
+
+The app is a **static site**. After `npm run build`, upload the contents of the **`dist/`** folder to any static host. No server or database is required.
+
+#### Option A – Vercel (recommended, free)
+
+1. Push your code to **GitHub** (if not already).
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
+3. **Add New Project** → import your `sayo-digital-menu_V2` repo.
+4. Leave **Build Command** as `npm run build` and **Output Directory** as `dist`. Click **Deploy**.
+5. Vercel gives you a URL like `sayo-digital-menu-xxx.vercel.app`. You can add a **custom domain** in Project → Settings → Domains.
+
+#### Option B – Netlify
+
+1. Push your code to **GitHub**.
+2. Go to [netlify.com](https://netlify.com) → **Add new site** → **Import an existing project** (GitHub).
+3. **Build command:** `npm run build`  
+   **Publish directory:** `dist`
+4. Deploy. Use the generated URL (e.g. `random-name.netlify.app`) or add a custom domain in **Domain settings**.
+
+#### Option C – Manual upload (your own domain / cPanel)
+
+1. Run `npm run build`.
+2. Upload **everything inside** the `dist/` folder to your host’s **web root** (e.g. `public_html` or the folder your domain points to).
+3. Ensure the server is configured for a **single-page app**: all routes (e.g. `/category/sushi`) should serve `index.html` so React Router works.  
+   - **Apache:** add a `.htaccess` with `FallbackResource /index.html` in the same folder as `index.html`.  
+   - **Nginx:** `try_files $uri $uri/ /index.html;`
+
+#### Custom domain (Vercel / Netlify)
+
+- In the dashboard, add your domain (e.g. `menu.sayorestaurant.com`).
+- Follow the instructions to add the DNS records (A/CNAME) at your domain registrar. Once DNS propagates, the site will be served on your domain.
+
+---
+
 ### File Map (Key Paths)
 
 - `src/design/tokens.css` – design tokens (colors, typography, spacing, radius, shadows, z-index, themes)

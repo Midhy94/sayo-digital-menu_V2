@@ -5,6 +5,7 @@ import type { DietaryTag, HighlightTag } from "../data/menuData";
 import { getCountryCodeForHighlightTag, countryCodeToFlag } from "../data/menuData";
 import { useFilter } from "../context/FilterContext";
 import { AppIcon, getDietaryIconName, getHighlightIconName } from "./AppIcon";
+import { SearchBar } from "./SearchBar";
 
 const HIDE_TAGS: DietaryTag[] = ["dairy", "nuts", "gluten", "honey"];
 
@@ -35,12 +36,24 @@ const SHOW_TAGS: HighlightTag[] = [
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  anchorRef: React.RefObject<HTMLDivElement | null>;
+  anchorRef: React.RefObject<HTMLElement | null>;
   /** Top offset in px (e.g. from getBoundingClientRect().bottom) for fixed positioning */
   top?: number;
+  /** When true, show search bar at top of dropdown (e.g. for mobile) */
+  showSearchInDropdown?: boolean;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 }
 
-export const SearchMegaDropdown: React.FC<Props> = ({ isOpen, onClose, anchorRef, top = 56 }) => {
+export const SearchMegaDropdown: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  anchorRef,
+  top = 56,
+  showSearchInDropdown = false,
+  searchValue = "",
+  onSearchChange,
+}) => {
   const { t } = useTranslation();
   const {
     hiddenAllergens,
@@ -99,6 +112,16 @@ export const SearchMegaDropdown: React.FC<Props> = ({ isOpen, onClose, anchorRef
                 </button>
               </div>
             </div>
+
+            {showSearchInDropdown && onSearchChange && (
+              <div className="search-mega-dropdown__search-wrap">
+                <SearchBar
+                  value={searchValue}
+                  onChange={onSearchChange}
+                  onFocus={undefined}
+                />
+              </div>
+            )}
 
             <section className="search-mega-dropdown__section">
               <h3 className="search-mega-dropdown__section-title">

@@ -122,6 +122,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - VEGETARIAN",
     calories: 80,
+    spiceLevel: 0,
   },
   {
     id: "hot-sour-soup-veggies",
@@ -131,6 +132,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - VEGETARIAN",
     calories: 140,
+    spiceLevel: 2,
   },
   {
     id: "veg-dumpling-soup",
@@ -140,6 +142,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - VEGETARIAN",
     calories: 190,
+    spiceLevel: 1,
   },
   // --- SOUPS - NON-VEGETARIAN ---
   {
@@ -150,6 +153,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 80,
+    spiceLevel: 0,
   },
   {
     id: "hot-sour-soup-chicken",
@@ -159,6 +163,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 140,
+    spiceLevel: 2,
   },
   {
     id: "tom-yum-soup-chicken",
@@ -168,6 +173,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 150,
+    spiceLevel: 2,
   },
   {
     id: "tom-yum-soup-shrimps",
@@ -177,6 +183,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 160,
+    spiceLevel: 2,
   },
   {
     id: "tom-kha-soup-chicken",
@@ -186,6 +193,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 180,
+    spiceLevel: 1,
   },
   {
     id: "tom-kha-soup-shrimps",
@@ -195,6 +203,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 190,
+    spiceLevel: 1,
   },
   {
     id: "spicy-chicken-dumpling-soup",
@@ -204,6 +213,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SOUPS - NON-VEGETARIAN",
     calories: 220,
+    spiceLevel: 2,
   },
   // --- SALADS - VEGETARIAN ---
   {
@@ -214,6 +224,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SALADS - VEGETARIAN",
     calories: 140,
+    spiceLevel: 0,
   },
   {
     id: "hummus-beiruti",
@@ -389,6 +400,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "SAYO LIVE SUSHI STATION - NON-VEGETARIAN",
     calories: 230,
+    spiceLevel: 2,
   },
   {
     id: "bbq-unagi-uramaki-roll",
@@ -628,6 +640,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ROBATA GRILL - VEGETARIAN",
     calories: 180,
+    spiceLevel: 2,
   },
   {
     id: "bbq-halloumi-shashlik",
@@ -729,6 +742,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - VEGETARIAN",
     calories: 95,
+    spiceLevel: 0,
   },
   {
     id: "spicy-steamed-edamame",
@@ -738,6 +752,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - VEGETARIAN",
     calories: 120,
+    spiceLevel: 2,
   },
   {
     id: "daikon-mushroom-cake",
@@ -756,6 +771,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - VEGETARIAN",
     calories: 240,
+    spiceLevel: 1,
   },
   {
     id: "sriracha-honey-lotus-stem",
@@ -765,6 +781,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - VEGETARIAN",
     calories: 280,
+    spiceLevel: 3,
   },
   {
     id: "truffle-forest-mushroom-spring-roll",
@@ -829,6 +846,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - NON-VEGETARIAN",
     calories: 410,
+    spiceLevel: 2,
   },
   {
     id: "korean-fried-chicken",
@@ -838,6 +856,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - NON-VEGETARIAN",
     calories: 430,
+    spiceLevel: 2,
   },
   {
     id: "fish-sweet-sour-sauce",
@@ -865,6 +884,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN APPETIZERS - NON-VEGETARIAN",
     calories: 340,
+    spiceLevel: 3,
   },
   {
     id: "dynamite-shrimps-tempura",
@@ -1132,6 +1152,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN MAINS & CURRIES - VEGETARIAN",
     calories: 420,
+    spiceLevel: 2,
   },
   // --- ASIAN MAINS & CURRIES - NON-VEGETARIAN ---
   {
@@ -1223,6 +1244,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN MAINS & CURRIES - NON-VEGETARIAN",
     calories: 580,
+    spiceLevel: 2,
   },
   {
     id: "thai-green-curry-shrimps",
@@ -1232,6 +1254,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN MAINS & CURRIES - NON-VEGETARIAN",
     calories: 620,
+    spiceLevel: 2,
   },
   {
     id: "malay-penang-curry-chicken",
@@ -1241,6 +1264,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN MAINS & CURRIES - NON-VEGETARIAN",
     calories: 680,
+    spiceLevel: 2,
   },
   {
     id: "malay-penang-curry-shrimp",
@@ -1250,6 +1274,7 @@ export const items: MenuItem[] = [
     categoryId: "food-menu",
     section: "ASIAN MAINS & CURRIES - NON-VEGETARIAN",
     calories: 680,
+    spiceLevel: 2,
   },
   // --- RAMEN BOWL - VEGETARIAN ---
   {

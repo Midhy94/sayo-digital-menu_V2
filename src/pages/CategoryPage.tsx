@@ -12,7 +12,7 @@ import { CustomDropdown } from "../components/CustomDropdown";
 import { useFilter } from "../context/FilterContext";
 
 /** Scroll threshold (px): floating FAB shows when user has scrolled down past this */
-const FAB_SCROLL_THRESHOLD_PX = 40;
+const FAB_SCROLL_THRESHOLD_PX = 16;
 
 export const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,8 +28,8 @@ export const CategoryPage: React.FC = () => {
   const [floatingNavOpen, setFloatingNavOpen] = useState(false);
   /** Show floating FAB only when top tabs have scrolled out of view */
   const [showFloatingFab, setShowFloatingFab] = useState(false);
-  /** View mode: grid (default) or list */
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  /** View mode: list (default) or grid */
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   const items = category ? getItemsForCategory(category.id) : [];
 
@@ -179,16 +179,6 @@ export const CategoryPage: React.FC = () => {
                   <div className="category-page__view-toggle" role="group" aria-label={t("viewMode")}>
                   <button
                     type="button"
-                    className={`category-page__view-btn ${viewMode === "grid" ? "category-page__view-btn--active" : ""}`}
-                    onClick={() => setViewMode("grid")}
-                    title={t("gridView")}
-                    aria-label={t("gridView")}
-                    aria-pressed={viewMode === "grid"}
-                  >
-                    <AppIcon name="viewGrid" size={18} strokeWidth={2} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
                     className={`category-page__view-btn ${viewMode === "list" ? "category-page__view-btn--active" : ""}`}
                     onClick={() => setViewMode("list")}
                     title={t("listView")}
@@ -196,6 +186,16 @@ export const CategoryPage: React.FC = () => {
                     aria-pressed={viewMode === "list"}
                   >
                     <AppIcon name="viewList" size={18} strokeWidth={2} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-page__view-btn ${viewMode === "grid" ? "category-page__view-btn--active" : ""}`}
+                    onClick={() => setViewMode("grid")}
+                    title={t("gridView")}
+                    aria-label={t("gridView")}
+                    aria-pressed={viewMode === "grid"}
+                  >
+                    <AppIcon name="viewGrid" size={18} strokeWidth={2} aria-hidden />
                   </button>
                   </div>
                 </div>

@@ -24,7 +24,7 @@ const SPICE_LABELS: Record<number, string> = {
   0: "spiceLevelMild",
   1: "spiceLevelMedium",
   2: "spiceLevelHot",
-  3: "spiceLevelExtraHot",
+  3: "spiceLevelExtreme",
 };
 
 interface Props {
@@ -50,7 +50,8 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
   const allergenList = item.allergens ?? [];
   const countryCode = getCountryCodeForItem(item);
   const isVegetarian = isVegetarianSection(item.section);
-  const spiceLevel = item.spiceLevel ?? (item.tags?.includes("extraHot") ? 3 : item.tags?.includes("hot") ? 2 : undefined);
+  /** 0 = mild, 1 = medium, 2 = hot, 3 = extra hot; show on every card, default mild */
+  const spiceLevel = item.spiceLevel ?? (item.tags?.includes("extraHot") ? 3 : item.tags?.includes("hot") ? 2 : 0);
 
   return (
     <motion.button
@@ -104,15 +105,17 @@ export const DishItem: React.FC<Props> = ({ item, onOpen, index }) => {
                 <AppIcon name="vegetarian" size={16} strokeWidth={2} className="dish-item__veg-icon" aria-hidden />
               </IconWithTooltip>
             )}
-            {spiceLevel != null && (
-              <IconWithTooltip label={t(SPICE_LABELS[spiceLevel] ?? "spiceLevelMild")}>
-                <span className="dish-item__spice" aria-hidden>
-                  {[1, 2, 3].slice(0, Math.max(1, spiceLevel + 1)).map((i) => (
-                    <AppIcon key={i} name="hot" size={12} strokeWidth={2} aria-hidden />
-                  ))}
-                </span>
-              </IconWithTooltip>
-            )}
+            <IconWithTooltip label={t(SPICE_LABELS[spiceLevel] ?? "spiceLevelMild")}>
+              <span
+                className={`dish-item__spice dish-item__spice--${["mild", "medium", "hot", "extreme"][spiceLevel] ?? "mild"}`}
+                aria-hidden
+              >
+                {[1, 2, 3, 4].slice(0, Math.max(1, spiceLevel + 1)).map((i) => (
+                  <AppIcon key={i} name="hot" size={12} strokeWidth={2} aria-hidden />
+                ))}
+                <span className="dish-item__spice-label">{t(SPICE_LABELS[spiceLevel] ?? "spiceLevelMild")}</span>
+              </span>
+            </IconWithTooltip>
             {item.calories != null && (
               <IconWithTooltip label={`${item.calories} ${t("calories")}`}>
                 <span className="dish-item__calories-wrap">
