@@ -1,7 +1,12 @@
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Theme } from "../hooks/useTheme";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { SearchBar } from "./SearchBar";
+import { SearchMegaDropdown } from "./SearchMegaDropdown";
+import { AppIcon } from "./AppIcon";
 
 interface HeaderProps {
   theme: Theme;
@@ -13,6 +18,22 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
   const { i18n, t } = useTranslation();
   const location = useLocation();
   const isCategoryPage = location.pathname.startsWith("/category/");
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [dropdownTop, setDropdownTop] = useState(56);
+  const searchAnchorRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  useEffect(() => {
+    if (!filterDropdownOpen) return;
+    if (isMobile && headerRef.current) {
+      setDropdownTop(headerRef.current.getBoundingClientRect().bottom);
+    } else if (searchAnchorRef.current) {
+      setDropdownTop(searchAnchorRef.current.getBoundingClientRect().bottom + 4);
+    }
+  }, [filterDropdownOpen, isMobile]);
 
   const isArabic = i18n.language === "ar";
   const logoSrc =
@@ -39,111 +60,89 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
     window.dispatchEvent(new Event("sayo-focus-search"));
   };
 
-  const dispatchOpenFilters = () => {
-    window.dispatchEvent(new Event("sayo-open-filters"));
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    window.dispatchEvent(new CustomEvent("sayo-search-query", { detail: value }));
   };
 
   return (
     <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: Number.parseInt(
-          getComputedStyle(document.documentElement).getPropertyValue("--z-navbar") || "100",
-          10,
-        ),
-        backdropFilter: scrolled ? "blur(16px)" : "none",
-        background: scrolled
-          ? theme === "dark"
-            ? "rgba(10,10,10,0.85)"
-            : "rgba(247,245,242,0.92)"
-          : "transparent",
-        borderBottom: scrolled ? "1px solid var(--color-border)" : "transparent",
-        borderBottomLeftRadius: scrolled ? 18 : 0,
-        borderBottomRightRadius: scrolled ? 18 : 0,
-      }}
+      ref={headerRef}
+      className={`header ${scrolled ? "header--scrolled" : ""} ${
+        theme === "light" ? "header--light" : "header--dark"
+      }`}
     >
-      <div className="container" style={{ paddingBlock: "0.6rem" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1rem",
-          }}
-        >
-          <Link to="/" style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={logoSrc}
-              alt={t("restaurantName")}
-              style={{ height: 32, width: "auto", display: "block" }}
-            />
-          </Link>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
+      <div className="container">
+        <div className="header__inner">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
             {isCategoryPage && (
               <motion.button
                 type="button"
+                aria-label={t("categoriesTitle")}
                 whileTap={{ scale: 0.94 }}
-                onClick={dispatchFocusSearch}
-                style={{
-                  borderRadius: 999,
-                  border: "1px solid var(--color-border)",
-                  padding: "0.35rem 0.8rem",
-                  background:
-                    theme === "dark"
-                      ? "rgba(15,15,15,0.92)"
-                      : "rgba(255,255,255,0.92)",
-                  color: "var(--color-text-primary)",
-                  fontSize: "0.75rem",
-                }}
+                onClick={() => navigate("/")}
+                className="header__back"
               >
-                {t("searchResults")}
+                <AppIcon name="arrowLeft" size={18} className="header__back-icon" />
               </motion.button>
             )}
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={logoSrc}
+                alt={t("restaurantName")}
+                style={{ height: 32, width: "auto", display: "block" }}
+              />
+            </Link>
+          </div>
 
+          <div className="header__actions">
             {isCategoryPage && (
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.94 }}
-                onClick={dispatchOpenFilters}
-                style={{
-                  borderRadius: 999,
-                  border: "1px solid var(--color-border)",
-                  padding: "0.35rem 0.8rem",
-                  background:
-                    theme === "dark"
-                      ? "rgba(15,15,15,0.92)"
-                      : "rgba(255,255,255,0.92)",
-                  color: "var(--color-text-primary)",
-                  fontSize: "0.75rem",
-                }}
-              >
-                {t("filters")}
-              </motion.button>
+              <>
+                {isMobile ? (
+                  <motion.button
+                    ref={searchAnchorRef}
+                    type="button"
+                    whileTap={{ scale: 0.94 }}
+                    onClick={() => setFilterDropdownOpen(true)}
+                    className="header__search-btn header__theme"
+                    aria-label={t("searchPlaceholder")}
+                  >
+                    <AppIcon name="search" size={20} className="header__theme-icon" />
+                  </motion.button>
+                ) : (
+                  <div
+                    ref={searchAnchorRef}
+                    className="header__search-wrap"
+                    style={{
+                      position: "relative",
+                      flex: 1,
+                      maxWidth: 380,
+                      minWidth: 260,
+                    }}
+                  >
+                    <SearchBar
+                      value={searchValue}
+                      onChange={handleSearchChange}
+                      onFocus={() => setFilterDropdownOpen(true)}
+                    />
+                  </div>
+                )}
+                <SearchMegaDropdown
+                  isOpen={filterDropdownOpen}
+                  onClose={() => setFilterDropdownOpen(false)}
+                  anchorRef={searchAnchorRef}
+                  top={dropdownTop}
+                  searchValue={searchValue}
+                  onSearchChange={handleSearchChange}
+                  showSearchInDropdown={isMobile}
+                />
+              </>
             )}
-
             <motion.button
               type="button"
               whileTap={{ scale: 0.94 }}
               onClick={toggleLanguage}
-              style={{
-                borderRadius: 999,
-                border: "1px solid var(--color-border)",
-                padding: "0.35rem 0.8rem",
-                background:
-                  theme === "dark"
-                    ? "rgba(15,15,15,0.92)"
-                    : "rgba(255,255,255,0.92)",
-                color: "var(--color-text-primary)",
-                fontSize: "0.75rem",
-              }}
+              className="header__lang"
             >
               {i18n.language === "ar" ? "EN" : "AR"}
             </motion.button>
@@ -153,23 +152,13 @@ export const Header: React.FC<HeaderProps> = ({ theme, onThemeChange, scrolled }
               whileTap={{ scale: 0.94 }}
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 999,
-                border: "1px solid var(--color-border)",
-                background:
-                  theme === "dark"
-                    ? "rgba(15,15,15,0.92)"
-                    : "rgba(255,255,255,0.92)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--color-text-primary)",
-                fontSize: "0.9rem",
-              }}
+              className="header__theme"
             >
-              {theme === "dark" ? "☾" : "☼"}
+              {theme === "dark" ? (
+                <AppIcon name="moon" size={18} className="header__theme-icon" />
+              ) : (
+                <AppIcon name="sun" size={18} className="header__theme-icon" />
+              )}
             </motion.button>
           </div>
         </div>

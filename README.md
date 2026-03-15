@@ -140,8 +140,48 @@ Helper functions:
 
 ---
 
+### Deploying to a Domain (client demo / production)
+
+The app is a **static site**. After `npm run build`, upload the contents of the **`dist/`** folder to any static host. No server or database is required.
+
+#### Option A – Vercel (recommended, free)
+
+1. Push your code to **GitHub** (if not already).
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
+3. **Add New Project** → import your `sayo-digital-menu_V2` repo.
+4. Leave **Build Command** as `npm run build` and **Output Directory** as `dist`. Click **Deploy**.
+5. Vercel gives you a URL like `sayo-digital-menu-xxx.vercel.app`. You can add a **custom domain** in Project → Settings → Domains.
+
+#### Option B – Netlify
+
+1. Push your code to **GitHub**.
+2. Go to [netlify.com](https://netlify.com) → **Add new site** → **Import an existing project** (GitHub).
+3. **Build command:** `npm run build`  
+   **Publish directory:** `dist`
+4. Deploy. Use the generated URL (e.g. `random-name.netlify.app`) or add a custom domain in **Domain settings**.
+
+#### Option C – Manual upload (your own domain / cPanel, FTP)
+
+1. Run `npm run build`.
+2. Upload the **contents** of the `dist/` folder (not the `dist` folder itself) into your **web root** (e.g. `public_html`).  
+   After upload, the root should contain:
+   - `index.html` (in the root)
+   - `assets/` folder (with `.js`, `.css`, logos, favicon)
+   - `.htaccess` (included from `public/`, so Apache serves the SPA correctly)
+3. **Wrong:** uploading the `dist` folder so the URL is `yoursite.com/dist/` — the app uses paths like `/assets/...`, so nothing will load.  
+   **Right:** upload so `yoursite.com` opens `index.html` and `yoursite.com/assets/...` finds the files.
+4. If your host uses **Nginx** instead of Apache, configure: `try_files $uri $uri/ /index.html;`
+
+#### Custom domain (Vercel / Netlify)
+
+- In the dashboard, add your domain (e.g. `menu.sayorestaurant.com`).
+- Follow the instructions to add the DNS records (A/CNAME) at your domain registrar. Once DNS propagates, the site will be served on your domain.
+
+---
+
 ### File Map (Key Paths)
 
+- `public/assets/` – static assets copied as-is into the build (logos, favicon). Use paths like `/assets/Logo_EN.svg` in code. Do not put these in a root-level `assets/` folder or they will not be included in the deployed site.
 - `src/design/tokens.css` – design tokens (colors, typography, spacing, radius, shadows, z-index, themes)
 - `src/styles/global.css` – global layout styles and shared utility classes
 - `src/i18n/config.ts` – i18next + react-i18next configuration (EN/AR)

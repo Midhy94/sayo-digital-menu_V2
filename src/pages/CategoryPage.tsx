@@ -1,35 +1,57 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  DietaryTag,
-  HighlightTag,
-  getCategoryBySlug,
-  getItemsForCategory,
-  MenuItem,
-} from "../data/menuData";
-import { SearchBar } from "../components/SearchBar";
+import { AnimatePresence, motion } from "framer-motion";
+import { getCategoryBySlug, getItemsForCategory, MenuItem } from "../data/menuData";
 import { DishItem } from "../components/DishItem";
 import { DishModal } from "../components/DishModal";
-import { FilterDrawer } from "../components/FilterDrawer";
 import { Footer } from "../components/Footer";
+import { AppIcon } from "../components/AppIcon";
+import { CustomDropdown } from "../components/CustomDropdown";
+import { useFilter } from "../context/FilterContext";
 
 export const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const category = slug ? getCategoryBySlug(slug) : undefined;
   const { t } = useTranslation();
+  const { highlightFilters, hiddenAllergens, clearFilters } = useFilter();
 
   const [query, setQuery] = useState("");
-  const [hiddenAllergens, setHiddenAllergens] = useState<DietaryTag[]>([]);
-  const [highlightFilters, setHighlightFilters] = useState<HighlightTag[]>([]);
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  /** Selected classification tab: null = "All", otherwise section name */
+  const [selectedClassification, setSelectedClassification] = useState<string | null>(null);
+  /** Floating nav panel open (toggle) */
+  const [floatingNavOpen, setFloatingNavOpen] = useState(false);
+  /** View mode: list (default) or grid */
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   const items = category ? getItemsForCategory(category.id) : [];
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+  const classifications = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((item) => {
+      if (item.section?.trim()) set.add(item.section.trim());
+    });
+    return Array.from(set).sort();
+  }, [items]);
+
+  const classificationCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    items.forEach((item) => {
+      const key = item.section?.trim() || "";
+      if (key) map.set(key, (map.get(key) ?? 0) + 1);
+    });
+    return map;
+  }, [items]);
+
+  const itemsByClassification = useMemo(() => {
+    let list = items;
+    const selected = (selectedClassification || "").trim();
+    if (selected) {
+      list = list.filter((item) => (item.section || "").trim() === selected);
+    }
+    return list.filter((item) => {
       if (query.trim()) {
         const q = query.toLowerCase();
         if (
@@ -39,85 +61,131 @@ export const CategoryPage: React.FC = () => {
           return false;
         }
       }
-      if (hiddenAllergens.length && item.allergens?.length) {
+      if (hiddenAllergens.length > 0 && item.allergens?.length) {
         if (item.allergens.some((a) => hiddenAllergens.includes(a))) {
           return false;
         }
       }
-      if (highlightFilters.length) {
-        if (!item.tags?.some((t) => highlightFilters.includes(t))) {
+      if (highlightFilters.length > 0) {
+        const matchesHighlight = item.tags?.some((t) => {
+          if (highlightFilters.includes(t)) return true;
+          if ((t === "chefSpecial" && highlightFilters.includes("chefSignature")) ||
+              (t === "chefSignature" && highlightFilters.includes("chefSpecial"))) {
+            return true;
+          }
           return false;
-        }
+        });
+        if (!matchesHighlight) return false;
       }
       return true;
     });
-  }, [items, query, hiddenAllergens, highlightFilters]);
+  }, [items, selectedClassification, query, hiddenAllergens, highlightFilters]);
+
+  const sections = useMemo(() => {
+    const bySection = new Map<string, MenuItem[]>();
+    itemsByClassification.forEach((item) => {
+      const key = item.section || "";
+      if (!bySection.has(key)) bySection.set(key, []);
+      bySection.get(key)!.push(item);
+    });
+    return Array.from(bySection.entries());
+  }, [itemsByClassification]);
 
   useEffect(() => {
-    const handleFocusSearch = () => {
-      if (searchInputRef.current) {
-        searchInputRef.current.focus();
-        searchInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+    setQuery("");
+    setSelectedClassification(null);
+    clearFilters();
+
+    const handleSearchQuery = (event: Event) => {
+      const custom = event as CustomEvent<string>;
+      setQuery(custom.detail ?? "");
     };
 
-    const handleOpenFilters = () => {
-      setFiltersOpen(true);
-    };
-
-    window.addEventListener("sayo-focus-search", handleFocusSearch);
-    window.addEventListener("sayo-open-filters", handleOpenFilters);
+    window.addEventListener("sayo-search-query", handleSearchQuery as EventListener);
 
     return () => {
-      window.removeEventListener("sayo-focus-search", handleFocusSearch);
-      window.removeEventListener("sayo-open-filters", handleOpenFilters);
+      window.removeEventListener("sayo-search-query", handleSearchQuery as EventListener);
     };
-  }, []);
+  }, [slug, clearFilters]);
 
   if (!category) {
     return null;
   }
 
-  const hasActiveFilters = hiddenAllergens.length > 0 || highlightFilters.length > 0;
+  const hasActiveFilters = highlightFilters.length > 0 || hiddenAllergens.length > 0;
 
   return (
     <main className="layout">
-      <section style={{ paddingTop: "3.2rem", paddingBottom: "0.5rem" }}>
+      <div className="layout__content">
+      <section className="category-page__header">
         <div className="container">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.75rem",
-            }}
-          >
-            <header>
-              <div className="pill">{t("allItems")}</div>
-              <h1
-                className="heading-xl"
-                style={{ margin: "0.7rem 0 0.15rem", fontSize: "1.6rem" }}
-              >
-                {category.name}
-              </h1>
-              <p
-                className="body-sm-muted"
-                style={{ margin: 0, fontSize: "0.88rem" }}
-              >
-                {category.description}
-              </p>
-            </header>
+          <div className="category-page__heading-block">
+            <div className="category-page__heading-row">
+              <header>
+                <h1
+                  className="heading-xl"
+                  style={{ margin: "0 0 0.15rem", fontSize: "1.35rem" }}
+                >
+                  {category.name}
+                </h1>
+                <p
+                  className="body-sm-muted"
+                  style={{ margin: 0, fontSize: "0.88rem" }}
+                >
+                  {category.description}
+                </p>
+              </header>
 
-            <SearchBar ref={searchInputRef} value={query} onChange={setQuery} />
+              <div className="category-page__header-actions">
+                {classifications.length > 0 && (
+                  <div className="category-page__section-dropdown-wrap">
+                    <span className="category-page__section-dropdown-label">{t("selectCategory")}</span>
+                    <CustomDropdown
+                      options={[
+                        { value: null, label: `${t("allClassifications")} (${items.length})` },
+                        ...classifications.map((name) => ({
+                          value: name,
+                          label: `${name} (${classificationCounts.get(name) ?? 0})`,
+                        })),
+                      ]}
+                      value={selectedClassification}
+                      onChange={setSelectedClassification}
+                      placeholder={t("allClassifications")}
+                      className="category-page__section-dropdown"
+                      aria-label={t("allClassifications")}
+                    />
+                  </div>
+                )}
+                <div className="category-page__view-toggle-wrap">
+                  <span className="category-page__view-toggle-label">{t("changeView")}</span>
+                  <div className="category-page__view-toggle" role="group" aria-label={t("viewMode")}>
+                  <button
+                    type="button"
+                    className={`category-page__view-btn ${viewMode === "list" ? "category-page__view-btn--active" : ""}`}
+                    onClick={() => setViewMode("list")}
+                    title={t("listView")}
+                    aria-label={t("listView")}
+                    aria-pressed={viewMode === "list"}
+                  >
+                    <AppIcon name="viewList" size={18} strokeWidth={2} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    className={`category-page__view-btn ${viewMode === "grid" ? "category-page__view-btn--active" : ""}`}
+                    onClick={() => setViewMode("grid")}
+                    title={t("gridView")}
+                    aria-label={t("gridView")}
+                    aria-pressed={viewMode === "grid"}
+                  >
+                    <AppIcon name="viewGrid" size={18} strokeWidth={2} aria-hidden />
+                  </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {hasActiveFilters && (
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "0.4rem",
-                  fontSize: "0.75rem",
-                }}
-              >
+              <div className="category-page__chips">
                 {hiddenAllergens.map((a) => (
                   <span
                     key={a}
@@ -144,52 +212,145 @@ export const CategoryPage: React.FC = () => {
 
       <section>
         <div className="container">
-          <div
-            className="card-surface scroll-y-soft"
-            style={{
-              maxHeight: "calc(100vh - 210px)",
-              overflowY: "auto",
-              paddingInline: "1rem",
-              paddingTop: "0.2rem",
-              paddingBottom: "1rem",
-            }}
-          >
-            {filteredItems.map((item, index) => (
-              <DishItem
-                key={item.id}
-                item={item}
-                index={index}
-                onOpen={() => setActiveItem(item)}
-              />
-            ))}
+          <div className="scroll-y-soft category-page__list-shell">
+            {itemsByClassification.length === 0 ? (
+              <p className="body-sm-muted" style={{ padding: "1rem 0.25rem" }}>
+                {query.trim() || hasActiveFilters
+                  ? t("noResultsWithFilters")
+                  : t("noItemsInCategory")}
+              </p>
+            ) : (
+              sections.map(([sectionName, sectionItems]) => (
+                <section
+                  key={sectionName || "default"}
+                  id={sectionName ? `section-${sectionName.replace(/\s+/g, "-")}` : undefined}
+                  className="category-page__section"
+                >
+                  {sectionName && (
+                    <h2 className="category-page__section-title">{sectionName}</h2>
+                  )}
+                  <div
+                    className={`category-page__section-grid ${viewMode === "list" ? "category-page__section-grid--list" : ""}`}
+                  >
+                    {sectionItems.map((item, index) => (
+                      <DishItem
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        onOpen={() => setActiveItem(item)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))
+            )}
           </div>
         </div>
       </section>
 
       <DishModal item={activeItem} onClose={() => setActiveItem(null)} />
 
-      <FilterDrawer
-        isOpen={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
-        hiddenAllergens={hiddenAllergens}
-        onToggleAllergen={(tag) =>
-          setHiddenAllergens((current) =>
-            current.includes(tag) ? current.filter((x) => x !== tag) : [...current, tag],
-          )
-        }
-        highlightFilters={highlightFilters}
-        onToggleHighlight={(tag) =>
-          setHighlightFilters((current) =>
-            current.includes(tag) ? current.filter((x) => x !== tag) : [...current, tag],
-          )
-        }
-        onClear={() => {
-          setHiddenAllergens([]);
-          setHighlightFilters([]);
-        }}
-      />
+      {classifications.length > 0 && (
+        <motion.div
+          className="category-page__floating-nav-wrap"
+          initial={{ opacity: 0, x: 72 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 72 }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        >
+          <AnimatePresence>
+            {floatingNavOpen && (
+              <>
+                <motion.div
+                  className="category-page__floating-nav-backdrop"
+                  aria-hidden
+                  onClick={() => setFloatingNavOpen(false)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                />
+                <motion.aside
+                  className="category-page__floating-nav"
+                  aria-label="Jump to section"
+                  initial={{ opacity: 0, scale: 0.92, y: 8 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, y: 8 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <div className="category-page__floating-nav-inner">
+                  <div className="category-page__floating-nav-header">
+                    <span className="category-page__floating-nav-title">{category.name}</span>
+                    <span className="category-page__floating-nav-count">{items.length}</span>
+                  </div>
+                  <nav className="category-page__floating-nav-list">
+                    <button
+                      type="button"
+                      className={`category-page__floating-nav-item ${selectedClassification === null ? "category-page__floating-nav-item--active" : ""}`}
+                      onClick={() => {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        flushSync(() => setSelectedClassification(null));
+                        setFloatingNavOpen(false);
+                        setTimeout(() => {
+                          document.querySelector(".category-page__list-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }, 80);
+                      }}
+                    >
+                      <span>{t("allClassifications")}</span>
+                      <span className="category-page__floating-nav-item-count">{items.length}</span>
+                    </button>
+                    {classifications.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        className={`category-page__floating-nav-item ${(selectedClassification || "").trim() === (name || "").trim() ? "category-page__floating-nav-item--active" : ""}`}
+                        onClick={() => {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          const value = String(name).trim() || null;
+                          flushSync(() => setSelectedClassification(value));
+                          setFloatingNavOpen(false);
+                          const sectionId = value ? `section-${String(value).replace(/\s+/g, "-")}` : null;
+                          setTimeout(() => {
+                            if (sectionId) document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }, 80);
+                        }}
+                      >
+                        <span>{name}</span>
+                        <span className="category-page__floating-nav-item-count">
+                          {classificationCounts.get(name) ?? 0}
+                        </span>
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+                </motion.aside>
+              </>
+            )}
+          </AnimatePresence>
+          <motion.button
+            type="button"
+            className="category-page__floating-nav-fab"
+            onClick={() => setFloatingNavOpen((o) => !o)}
+            aria-expanded={floatingNavOpen}
+            aria-label={floatingNavOpen ? "Close menu sections" : "Open menu sections"}
+            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.06 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          >
+            <motion.span
+              className="category-page__floating-nav-fab-icon"
+              aria-hidden
+              animate={{ scale: floatingNavOpen ? 1.1 : 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <AppIcon name="categoryList" size={22} strokeWidth={2} />
+            </motion.span>
+          </motion.button>
+        </motion.div>
+      )}
+
+      </div>
       <Footer />
     </main>
   );
 };
-

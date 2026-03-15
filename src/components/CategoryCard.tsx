@@ -16,56 +16,32 @@ export const CategoryCard: React.FC<Props> = ({ category, index }) => {
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.03 * index }}
-      style={{
-        backgroundColor: "var(--color-background-secondary)",
-        borderRadius: "var(--radius-md)",
-        border: "1px solid var(--color-border)",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
+      className="category-card"
     >
       <Link
         to={`/category/${category.slug}`}
-        style={{ display: "flex", flexDirection: "column", height: "100%" }}
+        className="category-card__link"
         aria-label={category.name}
       >
         <div
+          className="category-card__media"
           style={{
-            position: "relative",
-            paddingTop: "62%",
             backgroundImage:
               "url('https://images.pexels.com/photos/958546/pexels-photo-958546.jpeg?auto=compress&cs=tinysrgb&w=800')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
           }}
         >
           {/* image only, no overlay text */}
         </div>
         <div
-          style={{
-            padding: "0.85rem 0.95rem 1rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.25rem",
-            flexGrow: 1,
-          }}
+          className="category-card__body"
         >
           <h3
-            className="heading-lg"
-            style={{
-              margin: 0,
-              fontSize: "1rem",
-            }}
+            className="heading-lg category-card__title"
           >
             {category.name}
           </h3>
           <p
-            className="body-sm-muted"
-            style={{
-              margin: 0,
-              fontSize: "0.8rem",
-            }}
+            className="body-sm-muted category-card__description"
           >
             {category.description}
           </p>

@@ -6,9 +6,11 @@ import { Footer } from "../components/Footer";
 export const HomePage: React.FC = () => {
   return (
     <main className="layout">
-      <HeroBanner />
-      <StorySection />
-      <CategoryGrid />
+      <div className="layout__content">
+        <HeroBanner />
+        <StorySection />
+        <CategoryGrid />
+      </div>
       <Footer />
     </main>
   );
