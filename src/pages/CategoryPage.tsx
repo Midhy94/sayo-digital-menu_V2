@@ -11,9 +11,6 @@ import { AppIcon } from "../components/AppIcon";
 import { CustomDropdown } from "../components/CustomDropdown";
 import { useFilter } from "../context/FilterContext";
 
-/** Scroll threshold (px): floating FAB shows when user has scrolled down past this */
-const FAB_SCROLL_THRESHOLD_PX = 16;
-
 export const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const category = slug ? getCategoryBySlug(slug) : undefined;
@@ -26,8 +23,6 @@ export const CategoryPage: React.FC = () => {
   const [selectedClassification, setSelectedClassification] = useState<string | null>(null);
   /** Floating nav panel open (toggle) */
   const [floatingNavOpen, setFloatingNavOpen] = useState(false);
-  /** Show floating FAB only when top tabs have scrolled out of view */
-  const [showFloatingFab, setShowFloatingFab] = useState(false);
   /** View mode: list (default) or grid */
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
@@ -112,19 +107,6 @@ export const CategoryPage: React.FC = () => {
       window.removeEventListener("sayo-search-query", handleSearchQuery as EventListener);
     };
   }, [slug, clearFilters]);
-
-  // Show floating FAB when user scrolls down the page (not tied to heading position)
-  useEffect(() => {
-    const onScroll = () => {
-      const scrollY = window.scrollY ?? document.documentElement.scrollTop;
-      const show = scrollY > FAB_SCROLL_THRESHOLD_PX;
-      setShowFloatingFab(show);
-      if (!show) setFloatingNavOpen(false);
-    };
-    onScroll(); // set initial state
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   if (!category) {
     return null;
@@ -268,7 +250,7 @@ export const CategoryPage: React.FC = () => {
 
       <DishModal item={activeItem} onClose={() => setActiveItem(null)} />
 
-      {classifications.length > 0 && showFloatingFab && (
+      {classifications.length > 0 && (
         <motion.div
           className="category-page__floating-nav-wrap"
           initial={{ opacity: 0, x: 72 }}
