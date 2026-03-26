@@ -34,6 +34,7 @@ import {
 } from "iconoir-react";
 import type { DietaryTag, HighlightTag } from "../data/menuData";
 import { SaudiRiyalIcon } from "./SaudiRiyalIcon";
+import { NonVegIcon } from "./NonVegIcon";
 
 /** Default size and stroke for uniform icons across the app */
 const DEFAULT_SIZE = 20;
@@ -110,7 +111,7 @@ const ICON_MAP: Record<IconName, React.ComponentType<React.SVGProps<SVGSVGElemen
   vegan: Vegan,
   vegetarian: Leaf,
   containsEgg: Egg,
-  nonVegetarian: Cutlery,
+  nonVegetarian: NonVegIcon,
   hot: FireFlame,
   extraHot: FireFlame,
   cuisine: Globe,

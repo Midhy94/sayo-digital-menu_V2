@@ -96,7 +96,21 @@ export const CategoryGrid: React.FC = () => {
                 }}
               >
                 <div style={{ fontWeight: 600 }}>Opening Hours</div>
-                <div>5:30 PM – 3:00 AM · Sunday to Saturday</div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.2rem",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <div>
+                    <strong>Thu-Fri:</strong> 7:00 AM-11:00 AM, 11:30 AM-12:00 AM
+                  </div>
+                  <div>
+                    <strong>Sat-Wed:</strong> 7:00 AM-11:00 AM, 11:30 AM-11:30 PM
+                  </div>
+                </div>
                 <div style={{ fontWeight: 600, marginTop: "0.6rem" }}>Phone</div>
                 <a href="tel:+966000000000">+966 00 000 0000</a>
                 <div style={{ fontWeight: 600, marginTop: "0.6rem" }}>Website</div>
